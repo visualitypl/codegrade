@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
-# encoding: utf-8
 
 $LOAD_PATH.unshift(File.dirname(File.realpath(__FILE__)) + '/../lib')
 
 require 'codegrade'
 
-offenses = Codegrade::Grader::Grader.new(Codegrade::Commit.new).grade
+commit = Codegrade::Commit.new('.', ARGV[0])
+offenses = Codegrade::Grader::Grader.new(commit).grade
 Codegrade::Formatter.new(offenses).print

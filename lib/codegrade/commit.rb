@@ -32,9 +32,12 @@ module Codegrade
     def parse_git_tree(tree, path)
       files = []
 
-      tree.walk_blobs do |root, entry|
-        path = File.expand_path(root, working_directory)
-        files.push(File.join(path, entry[:name]))
+      return [] if commit.parents.size > 1
+
+      diff = commit.parents[0].diff(commit)
+
+      diff.deltas.each do |delta|
+        files.push(delta.new_file[:path])
       end
 
       files
