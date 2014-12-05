@@ -54,6 +54,49 @@ Ending comment here."
     end
   end
 
+  context 'title too long' do
+    let(:message) { "Wrong commit with more that 50 chars that is just wrong" }
+
+    it 'returns relevant error' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.grade
+
+      expect(grader.offenses.count).to eq 1
+      expect(find_offense(grader,
+        :category    => 'title_too_long',
+        :line_number => 1)).not_to be_nil
+    end
+  end
+
+  context 'title ending with a dot' do
+    let(:message) { "Wrong commit with dot." }
+
+    it 'returns relevant error' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.grade
+
+      expect(grader.offenses.count).to eq 1
+      expect(find_offense(grader,
+        :category      => 'title_trailing_dot',
+        :line_number   => 1,
+        :column_number => 21)).not_to be_nil
+    end
+  end
+
+  context 'title with multiple lines' do
+    let(:message) { "Wrong commit with\ntitle in multiple lines." }
+
+    it 'returns relevant error' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.grade
+
+      expect(grader.offenses.count).to eq 1
+      expect(find_offense(grader,
+        :category      => 'title_multiple_lines',
+        :line_number   => 2)).not_to be_nil
+    end
+  end
+
   context 'redundant empty lines' do
     let(:message) do
       "Commit
@@ -160,6 +203,31 @@ Another line that is longer than 70 characters and violates our sacred rules."
     end
   end
 
+  context 'paragraph starting with small letter' do
+    let(:message) do
+      "Commit
+
+wrong para.
+
+Good.
+
+ wrong again."
+    end
+
+    it 'returns relevant errors' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.grade
+
+      expect(grader.offenses.count).to eq 3
+      expect(find_offense(grader,
+        :category      => 'paragraph_leading_lowercase',
+        :line_number   => 3)).not_to be_nil
+      expect(find_offense(grader,
+        :category      => 'paragraph_leading_lowercase',
+        :line_number   => 7)).not_to be_nil
+    end
+  end
+
   context 'punctation with no separating line' do
     let(:message) do
       "Commit
@@ -209,6 +277,61 @@ small
         :category      => 'punctation_leading_whitespace',
         :line_number   => 10,
         :column_number => 3)).not_to be_nil
+    end
+  end
+
+  context 'punctation starting with small letter' do
+    let(:message) do
+      "Commit
+
+* punctation
+
+* Punctation
+
+* xunctation"
+    end
+
+    it 'returns relevant errors' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.grade
+
+      expect(grader.offenses.count).to eq 2
+      expect(find_offense(grader,
+        :category      => 'punctation_leading_lowercase',
+        :line_number   => 3,
+        :column_number => 3)).not_to be_nil
+      expect(find_offense(grader,
+        :category      => 'punctation_leading_lowercase',
+        :line_number   => 7,
+        :column_number => 3)).not_to be_nil
+    end
+  end
+
+  context 'punctation ending with a dot' do
+    let(:message) do
+      "Commit
+
+* Punctation.
+
+* Punctation
+
+* Punctation
+  end."
+    end
+
+    it 'returns relevant errors' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.grade
+
+      expect(grader.offenses.count).to eq 2
+      expect(find_offense(grader,
+        :category      => 'punctation_trailing_dot',
+        :line_number   => 3,
+        :column_number => 13)).not_to be_nil
+      expect(find_offense(grader,
+        :category      => 'punctation_trailing_dot',
+        :line_number   => 8,
+        :column_number => 6)).not_to be_nil
     end
   end
 end
