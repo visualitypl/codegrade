@@ -29,6 +29,7 @@ module Codegrade
           paragraph << line
           paragraph_line += 1
           blank_line = blank?(line)
+          title_line = line_number == 1
 
           if line.start_with?('* ')
             check_punctation_no_separating_line(inside_punctation, line_number)
@@ -36,8 +37,10 @@ module Codegrade
             inside_punctation = true
           end
 
-          if line_number == 1
+          if title_line
             check_title_leading_lowercase(line, line_number)
+            check_title_too_long(line, line_number)
+            check_title_trailing_dot(line, line_number)
           end
 
           if blank_line
@@ -46,8 +49,10 @@ module Codegrade
             paragraph, paragraph_start, paragraph_line = [], line_number, 0
             inside_punctation = false
           else
+            check_title_multiple_lines(line_number)
+
             check_line_trailing_whitespace(line, line_number)
-            check_line_too_long(line, line_number)
+            check_line_too_long(line, line_number) unless title_line
           end
 
           if inside_punctation
@@ -71,12 +76,37 @@ module Codegrade
         end
       end
 
+      def check_title_too_long(line, line_number)
+        if line.length > 50
+          add_offense(
+            :category      => 'title_too_long',
+            :line_number   => line_number,
+            :column_number => 51)
+        end
+      end
+
+      def check_title_trailing_dot(line, line_number)
+        if (m = line.match(/\.\s*$/))
+          add_offense(
+            :category      => 'title_trailing_dot',
+            :line_number   => line_number,
+            :column_number => m.begin(0))
+        end
+      end
+
+      def check_title_multiple_lines(line_number)
+        if line_number == 2
+          add_offense(
+            :category    => 'title_multiple_lines',
+            :line_number => line_number)
+        end
+      end
+
       def check_redundant_empty_line(paragraph, line_number)
         if paragraph.select { |line| !blank?(line) }.empty?
           add_offense(
             :category       => 'redundant_empty_line',
-            :line_number    => line_number,
-            :column_number  => nil)
+            :line_number    => line_number)
         end
       end
 
@@ -111,8 +141,7 @@ module Codegrade
         if inside_punctation
           add_offense(
             :category      => 'punctation_no_separating_line',
-            :line_number   => line_number,
-            :column_number => nil)
+            :line_number   => line_number)
         end
       end
 

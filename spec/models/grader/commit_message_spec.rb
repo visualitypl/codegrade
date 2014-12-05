@@ -54,6 +54,49 @@ Ending comment here."
     end
   end
 
+  context 'title too long' do
+    let(:message) { "Wrong commit with more that 50 chars that is just wrong" }
+
+    it 'returns relevant error' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.execute
+
+      expect(grader.offenses.count).to eq 1
+      expect(find_offense(grader,
+        :category    => 'title_too_long',
+        :line_number => 1)).not_to be_nil
+    end
+  end
+
+  context 'title ending with a dot' do
+    let(:message) { "Wrong commit with dot." }
+
+    it 'returns relevant error' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.execute
+
+      expect(grader.offenses.count).to eq 1
+      expect(find_offense(grader,
+        :category      => 'title_trailing_dot',
+        :line_number   => 1,
+        :column_number => 21)).not_to be_nil
+    end
+  end
+
+  context 'title with multiple lines' do
+    let(:message) { "Wrong commit with\ntitle in multiple lines" }
+
+    it 'returns relevant error' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.execute
+
+      expect(grader.offenses.count).to eq 1
+      expect(find_offense(grader,
+        :category      => 'title_multiple_lines',
+        :line_number   => 2)).not_to be_nil
+    end
+  end
+
   context 'redundant empty lines' do
     let(:message) do
       "Commit
