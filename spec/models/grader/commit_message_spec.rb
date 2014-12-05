@@ -279,4 +279,59 @@ small
         :column_number => 3)).not_to be_nil
     end
   end
+
+  context 'punctation starting with small letter' do
+    let(:message) do
+      "Commit
+
+* punctation
+
+* Punctation
+
+* xunctation"
+    end
+
+    it 'returns relevant errors' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.grade
+
+      expect(grader.offenses.count).to eq 2
+      expect(find_offense(grader,
+        :category      => 'punctation_leading_lowercase',
+        :line_number   => 3,
+        :column_number => 3)).not_to be_nil
+      expect(find_offense(grader,
+        :category      => 'punctation_leading_lowercase',
+        :line_number   => 7,
+        :column_number => 3)).not_to be_nil
+    end
+  end
+
+  context 'punctation ending with a dot' do
+    let(:message) do
+      "Commit
+
+* Punctation.
+
+* Punctation
+
+* Punctation
+  end."
+    end
+
+    it 'returns relevant errors' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.grade
+
+      expect(grader.offenses.count).to eq 2
+      expect(find_offense(grader,
+        :category      => 'punctation_trailing_dot',
+        :line_number   => 3,
+        :column_number => 13)).not_to be_nil
+      expect(find_offense(grader,
+        :category      => 'punctation_trailing_dot',
+        :line_number   => 8,
+        :column_number => 6)).not_to be_nil
+    end
+  end
 end

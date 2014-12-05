@@ -49,6 +49,8 @@ module Codegrade
 
           if end_of_paragraph
             if inside_punctation
+              check_punctation_leading_lowercase(paragraph, paragraph_start)
+              check_punctation_trailing_dot(paragraph, paragraph_start)
             else
               check_paragraph_leading_lowercase(paragraph, paragraph_start)
               check_paragraph_no_trailing_dot(paragraph, paragraph_start)
@@ -187,6 +189,30 @@ module Codegrade
             :category      => 'punctation_leading_whitespace',
             :line_number   => line_number,
             :column_number => m.end(0))
+        end
+      end
+
+      def check_punctation_leading_lowercase(paragraph, paragraph_start)
+        line = strip(paragraph.first)
+
+        if line[2].downcase == line[2] &&
+            !link?(line.split[0])
+          add_offense(
+            :category      => 'punctation_leading_lowercase',
+            :line_number   => paragraph_start,
+            :column_number => 3)
+        end
+      end
+
+      def check_punctation_trailing_dot(paragraph, paragraph_start)
+        line = strip(paragraph.last)
+
+        if line[-1] == '.' &&
+            !link?(line.split[-1])
+          add_offense(
+            :category      => 'punctation_trailing_dot',
+            :line_number   => paragraph_start + paragraph.length - 1,
+            :column_number => paragraph.last.length)
         end
       end
 
