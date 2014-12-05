@@ -19,27 +19,42 @@ module Codegrade
         lines = @message.split("\n")
 
         paragraph, paragraph_start, paragraph_line = [], 1, 0
+        inside_punctation = false
 
         lines.each_with_index do |line, index|
           line_number = index + 1
           paragraph << line
           paragraph_line += 1
+          blank_line = blank?(line)
+
+          if line.start_with?('* ')
+            check_punctation_no_separating_line(inside_punctation, line_number)
+
+            inside_punctation = true
+          end
 
           if line_number == 1
             check_title_leading_lowercase(line, line_number)
           end
 
-          if blank?(line)
+          if blank_line
             check_redundant_empty_line(paragraph, line_number)
 
             paragraph, paragraph_start, paragraph_line = [], line_number, 0
+            inside_punctation = false
           else
             check_line_trailing_whitespace(line, line_number)
-            check_line_leading_whitespace(line, line_number)
             check_line_too_long(line, line_number)
           end
 
-          unless false # inside punctation
+          if inside_punctation
+            if paragraph_line > 1
+              check_punctation_leading_whitespace(line, line_number)
+            end
+          else
+            if ! blank_line
+              check_line_leading_whitespace(line, line_number)
+            end
           end
         end
       end
@@ -90,6 +105,26 @@ module Codegrade
             :category      => 'line_too_long',
             :line_number   => line_number,
             :column_number => 71
+          }
+        end
+      end
+
+      def check_punctation_no_separating_line(inside_punctation, line_number)
+        if inside_punctation
+          @errors << {
+            :category      => 'punctation_no_separating_line',
+            :line_number   => line_number,
+            :column_number => nil
+          }
+        end
+      end
+
+      def check_punctation_leading_whitespace(line, line_number)
+        if (m = line.match(/^\s*/)) && m.end(0) != 2
+          @errors << {
+            :category      => 'punctation_leading_whitespace',
+            :line_number   => line_number,
+            :column_number => m.end(0)
           }
         end
       end

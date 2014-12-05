@@ -116,7 +116,10 @@ Another line. \nLast line."
   Wrong indent.
 
  Another
-      and one more."
+      and one more.
+
+* Punctation
+  OK"
     end
 
     it 'returns relevant errors' do
@@ -154,6 +157,58 @@ Another line that is longer than 70 characters and violates our sacred rules."
         :category      => 'line_too_long',
         :line_number   => 3,
         :column_number => 71)).not_to be_nil
+    end
+  end
+
+  context 'punctation with no separating line' do
+    let(:message) do
+      "Commit
+
+* Punctation
+  OK
+
+* Punctation
+  close 1
+* Punctation
+  close 2"
+    end
+
+    it 'returns relevant errors' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.execute
+
+      expect(find_error(grader,
+        :category      => 'punctation_no_separating_line',
+        :line_number   => 8)).not_to be_nil
+    end
+  end
+
+  context 'punctation with wrong leading whitespace' do
+    let(:message) do
+      "Commit
+
+* Punctation
+small
+
+* Punctation
+  OK
+
+* Punctation
+   big"
+    end
+
+    it 'returns relevant errors' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.execute
+
+      expect(find_error(grader,
+        :category      => 'punctation_leading_whitespace',
+        :line_number   => 4,
+        :column_number => 0)).not_to be_nil
+      expect(find_error(grader,
+        :category      => 'punctation_leading_whitespace',
+        :line_number   => 10,
+        :column_number => 3)).not_to be_nil
     end
   end
 end
