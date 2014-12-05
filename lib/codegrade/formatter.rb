@@ -13,7 +13,7 @@ module Codegrade
         puts
 
         offenses.each do |offense|
-          file = offense.file.gsub(working_directory, '')[1..-1]
+          file = offense.file.gsub(working_directory, '') unless offense.file.nil?
           puts "- #{file}:#{offense.line_number}:#{offense.column_number}"
         end
 
