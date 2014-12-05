@@ -16,7 +16,9 @@ module Codegrade
         team = RuboCop::Cop::Team.new(classes, config, {})
 
         team.inspect_file(processed_file).map do |rubocop_offense|
-          Offense.new(rubocop_offense)
+          Offense.new(category: rubocop_offense.message,
+            line_number: rubocop_offense.line,
+            column_number: rubocop_offense.real_column)
         end
       end
 
