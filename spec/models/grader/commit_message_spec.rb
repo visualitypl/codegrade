@@ -1,21 +1,6 @@
 require 'spec_helper'
 
 describe Codegrade::Grader::CommitMessage do
-  def find_offense(grader, conditions = {})
-    grader.offenses.find do |error|
-      all_met = true
-
-      conditions.each do |key, value|
-        if error[key] != value
-          all_met = false
-          break
-        end
-      end
-
-      all_met
-    end
-  end
-
   context 'proper reference commit' do
     let(:message) do
       "Implement perfect commit
