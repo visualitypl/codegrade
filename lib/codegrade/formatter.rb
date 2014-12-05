@@ -5,7 +5,7 @@ module Codegrade
     end
 
     def print
-      group_by_categories
+      group_by_files
       working_directory = File.expand_path('.')
 
       @categories.each do |category, offenses|
@@ -14,7 +14,7 @@ module Codegrade
 
         offenses.each do |offense|
           file = offense.file.gsub(working_directory, '') unless offense.file.nil?
-          puts "- #{file}:#{offense.line_number}:#{offense.column_number}"
+          puts "- #{offense.line_number}:#{offense.column_number} #{offense.category}"
         end
 
         puts
@@ -23,12 +23,12 @@ module Codegrade
 
     private
 
-    def group_by_categories
+    def group_by_files
       @categories = Hash.new
 
       @offenses.each do |offense|
-        @categories[offense.category] ||= []
-        @categories[offense.category].push(offense)
+        @categories[offense.file] ||= []
+        @categories[offense.file].push(offense)
       end
     end
   end
