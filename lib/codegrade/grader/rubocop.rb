@@ -27,8 +27,10 @@ module Codegrade
       private
 
       def classes
+        skipped_cops = ['Style/AlignParameters']
+
         RuboCop::Cop::Cop.all.reject do |cop|
-          cop.rails?
+          cop.rails? || skipped_cops.include?(cop.cop_name)
         end
       end
     end
