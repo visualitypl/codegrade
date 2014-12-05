@@ -59,7 +59,7 @@ Ending comment here."
 
     it 'returns relevant error' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(grader.offenses.count).to eq 1
       expect(find_offense(grader,
@@ -73,7 +73,7 @@ Ending comment here."
 
     it 'returns relevant error' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(grader.offenses.count).to eq 1
       expect(find_offense(grader,
@@ -88,7 +88,7 @@ Ending comment here."
 
     it 'returns relevant error' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(grader.offenses.count).to eq 1
       expect(find_offense(grader,
@@ -200,6 +200,31 @@ Another line that is longer than 70 characters and violates our sacred rules."
         :category      => 'line_too_long',
         :line_number   => 3,
         :column_number => 71)).not_to be_nil
+    end
+  end
+
+  context 'paragraph starting with small letter' do
+    let(:message) do
+      "Commit
+
+wrong para.
+
+Good.
+
+ wrong again."
+    end
+
+    it 'returns relevant errors' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.grade
+
+      expect(grader.offenses.count).to eq 3
+      expect(find_offense(grader,
+        :category      => 'paragraph_leading_lowercase',
+        :line_number   => 3)).not_to be_nil
+      expect(find_offense(grader,
+        :category      => 'paragraph_leading_lowercase',
+        :line_number   => 7)).not_to be_nil
     end
   end
 

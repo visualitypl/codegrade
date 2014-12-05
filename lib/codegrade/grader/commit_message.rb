@@ -58,7 +58,7 @@ module Codegrade
           if blank_line
             check_redundant_empty_line(paragraph, line_number)
 
-            paragraph, paragraph_start, paragraph_line = [], line_number, 0
+            paragraph, paragraph_start, paragraph_line = [], line_number + 1, 0
             inside_punctation = false
           else
             check_title_multiple_lines(line_number)
