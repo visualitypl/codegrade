@@ -35,7 +35,7 @@ Ending comment here."
 
     it 'returns no errors' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(grader.offenses).to be_empty
     end
@@ -46,7 +46,7 @@ Ending comment here."
 
     it 'returns relevant error' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(find_offense(grader,
         :category    => 'title_leading_lowercase',
@@ -69,7 +69,7 @@ Two here."
 
     it 'returns relevant errors' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(grader.offenses.count).to eq 4
       expect(find_offense(grader,
@@ -95,7 +95,7 @@ Another line. \nLast line."
 
     it 'returns relevant errors' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(grader.offenses.count).to eq 2
       expect(find_offense(grader,
@@ -124,7 +124,7 @@ Another line. \nLast line."
 
     it 'returns relevant errors' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(grader.offenses.count).to eq 3
       expect(find_offense(grader,
@@ -151,7 +151,7 @@ Another line that is longer than 70 characters and violates our sacred rules."
 
     it 'returns relevant error' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(find_offense(grader,
         :category      => 'line_too_long',
@@ -175,7 +175,7 @@ Another line that is longer than 70 characters and violates our sacred rules."
 
     it 'returns relevant errors' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(find_offense(grader,
         :category      => 'punctation_no_separating_line',
@@ -199,7 +199,7 @@ small
 
     it 'returns relevant errors' do
       grader = Codegrade::Grader::CommitMessage.new(message)
-      grader.execute
+      grader.grade
 
       expect(find_offense(grader,
         :category      => 'punctation_leading_whitespace',

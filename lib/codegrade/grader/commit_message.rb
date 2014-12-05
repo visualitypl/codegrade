@@ -7,7 +7,7 @@ module Codegrade
         @message = message
       end
 
-      def execute
+      def grade
         clear_offenses
         parse_commit_message
       end
