@@ -10,7 +10,9 @@ module Codegrade
       def grade
         offenses = []
 
-        offenses.concat(CommitMessage.new(@commit.message).grade)
+        commit_message = CommitMessage.new(@commit.message)
+        commit_message.grade
+        offenses.concat(commit_message.offenses)
         ruby_files.each do |file|
           offenses.concat(Rubocop.new(file).grade)
         end
