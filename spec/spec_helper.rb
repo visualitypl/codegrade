@@ -1,4 +1,4 @@
-require_relative '../lib/codegrade/grader/commit_message'
+require_relative '../lib/codegrade'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
