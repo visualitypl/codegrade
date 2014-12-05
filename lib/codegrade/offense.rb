@@ -6,7 +6,9 @@ module Codegrade
       super(
         :category       => params[:category],
         :line_number    => params[:line_number],
-        :column_number  => params[:column_number]
+        :column_number  => params[:column_number],
+        :file           => params[:file],
+        :source         => params[:source]
       )
     end
 

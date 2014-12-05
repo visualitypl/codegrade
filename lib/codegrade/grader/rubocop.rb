@@ -18,7 +18,9 @@ module Codegrade
         team.inspect_file(processed_file).map do |rubocop_offense|
           Offense.new(category: rubocop_offense.message,
             line_number: rubocop_offense.line,
-            column_number: rubocop_offense.real_column)
+            column_number: rubocop_offense.real_column,
+            file: file,
+            source: rubocop_offense.location.source)
         end
       end
 
