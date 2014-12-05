@@ -35,6 +35,11 @@ module Codegrade
             paragraph, paragraph_start, paragraph_line = [], line_number, 0
           else
             check_line_trailing_whitespace(line, line_number)
+            check_line_leading_whitespace(line, line_number)
+            check_line_too_long(line, line_number)
+          end
+
+          unless false # inside punctation
           end
         end
       end
@@ -65,6 +70,26 @@ module Codegrade
             :category      => 'line_trailing_whitespace',
             :line_number   => line_number,
             :column_number => m.begin(0) + 1
+          }
+        end
+      end
+
+      def check_line_leading_whitespace(line, line_number)
+        if (m = line.match(/^\s+/))
+          @errors << {
+            :category      => 'line_leading_whitespace',
+            :line_number   => line_number,
+            :column_number => m.end(0)
+          }
+        end
+      end
+
+      def check_line_too_long(line, line_number)
+        if line.length > 70
+          @errors << {
+            :category      => 'line_too_long',
+            :line_number   => line_number,
+            :column_number => 71
           }
         end
       end

@@ -87,13 +87,13 @@ Two here."
     end
   end
 
-  context 'trailing whitespace' do
+  context 'line with trailing whitespace' do
     let(:message) do
       "Commit  \n
 Another line. \nLast line."
     end
 
-    it 'returns relevant error' do
+    it 'returns relevant errors' do
       grader = Codegrade::Grader::CommitMessage.new(message)
       grader.execute
 
@@ -106,6 +106,54 @@ Another line. \nLast line."
         :category      => 'line_trailing_whitespace',
         :line_number   => 3,
         :column_number => 14)).not_to be_nil
+    end
+  end
+
+  context 'line outside punctation with leading whitespace' do
+    let(:message) do
+      "Commit
+
+  Wrong indent.
+
+ Another
+      and one more."
+    end
+
+    it 'returns relevant errors' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.execute
+
+      expect(grader.errors.count).to eq 3
+      expect(find_error(grader,
+        :category      => 'line_leading_whitespace',
+        :line_number   => 3,
+        :column_number => 2)).not_to be_nil
+      expect(find_error(grader,
+        :category      => 'line_leading_whitespace',
+        :line_number   => 5,
+        :column_number => 1)).not_to be_nil
+      expect(find_error(grader,
+        :category      => 'line_leading_whitespace',
+        :line_number   => 6,
+        :column_number => 6)).not_to be_nil
+    end
+  end
+
+  context 'too long line outside of title' do
+    let(:message) do
+      "Commit
+
+Another line that is longer than 70 characters and violates our sacred rules."
+    end
+
+    it 'returns relevant error' do
+      grader = Codegrade::Grader::CommitMessage.new(message)
+      grader.execute
+
+      expect(find_error(grader,
+        :category      => 'line_too_long',
+        :line_number   => 3,
+        :column_number => 71)).not_to be_nil
     end
   end
 end
