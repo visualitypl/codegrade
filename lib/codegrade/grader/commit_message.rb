@@ -33,6 +33,8 @@ module Codegrade
             check_redundant_empty_line(paragraph, line_number)
 
             paragraph, paragraph_start, paragraph_line = [], line_number, 0
+          else
+            check_line_trailing_whitespace(line, line_number)
           end
         end
       end
@@ -48,7 +50,7 @@ module Codegrade
       end
 
       def check_redundant_empty_line(paragraph, line_number)
-        if paragraph.empty?
+        if paragraph.select { |line| !blank?(line) }.empty?
           @errors << {
             :category       => 'redundant_empty_line',
             :line_number    => line_number,
@@ -57,8 +59,18 @@ module Codegrade
         end
       end
 
+      def check_line_trailing_whitespace(line, line_number)
+        if (m = line.match(/\s+$/))
+          @errors << {
+            :category      => 'line_trailing_whitespace',
+            :line_number   => line_number,
+            :column_number => m.begin(0) + 1
+          }
+        end
+      end
+
       def blank?(text)
-        text.match(/^\s+$/)
+        text.match(/^\s*$/)
       end
     end
   end
