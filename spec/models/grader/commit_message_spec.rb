@@ -84,7 +84,7 @@ Ending comment here."
   end
 
   context 'title with multiple lines' do
-    let(:message) { "Wrong commit with\ntitle in multiple lines" }
+    let(:message) { "Wrong commit with\ntitle in multiple lines." }
 
     it 'returns relevant error' do
       grader = Codegrade::Grader::CommitMessage.new(message)
