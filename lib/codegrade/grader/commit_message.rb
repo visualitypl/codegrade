@@ -1,19 +1,22 @@
 module Codegrade
   module Grader
     class CommitMessage
-      attr_reader :errors
+      attr_reader :offenses
 
       def initialize(message)
         @message = message
       end
 
       def execute
-        @errors = []
-
+        clear_offenses
         parse_commit_message
       end
 
       private
+
+      def clear_offenses
+        @offenses = []
+      end
 
       def parse_commit_message
         lines = @message.split("\n")
@@ -61,72 +64,69 @@ module Codegrade
 
       def check_title_leading_lowercase(line, line_number)
         if line[0].downcase == line[0]
-          @errors << {
+          add_offense(
             :category       => 'title_leading_lowercase',
             :line_number    => line_number,
-            :column_number  => 1
-          }
+            :column_number  => 1)
         end
       end
 
       def check_redundant_empty_line(paragraph, line_number)
         if paragraph.select { |line| !blank?(line) }.empty?
-          @errors << {
+          add_offense(
             :category       => 'redundant_empty_line',
             :line_number    => line_number,
-            :column_number  => nil
-          }
+            :column_number  => nil)
         end
       end
 
       def check_line_trailing_whitespace(line, line_number)
         if (m = line.match(/\s+$/))
-          @errors << {
+          add_offense(
             :category      => 'line_trailing_whitespace',
             :line_number   => line_number,
-            :column_number => m.begin(0) + 1
-          }
+            :column_number => m.begin(0) + 1)
         end
       end
 
       def check_line_leading_whitespace(line, line_number)
         if (m = line.match(/^\s+/))
-          @errors << {
+          add_offense(
             :category      => 'line_leading_whitespace',
             :line_number   => line_number,
-            :column_number => m.end(0)
-          }
+            :column_number => m.end(0))
         end
       end
 
       def check_line_too_long(line, line_number)
         if line.length > 70
-          @errors << {
+          add_offense(
             :category      => 'line_too_long',
             :line_number   => line_number,
-            :column_number => 71
-          }
+            :column_number => 71)
         end
       end
 
       def check_punctation_no_separating_line(inside_punctation, line_number)
         if inside_punctation
-          @errors << {
+          add_offense(
             :category      => 'punctation_no_separating_line',
             :line_number   => line_number,
-            :column_number => nil
-          }
+            :column_number => nil)
         end
       end
 
       def check_punctation_leading_whitespace(line, line_number)
         if (m = line.match(/^\s*/)) && m.end(0) != 2
-          @errors << {
+          add_offense(
             :category      => 'punctation_leading_whitespace',
             :line_number   => line_number,
-            :column_number => m.end(0)
-          }
+            :column_number => m.end(0))
         end
+      end
+
+      def add_offense(params)
+        @offenses << Codegrade::Offense.new(params)
       end
 
       def blank?(text)
