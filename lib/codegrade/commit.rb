@@ -37,6 +37,8 @@ module Codegrade
       diff = commit.parents[0].diff(commit)
 
       diff.deltas.each do |delta|
+        next if delta.status == :deleted
+
         files.push(delta.new_file[:path])
       end
 
