@@ -231,7 +231,7 @@ module Codegrade
       end
 
       def add_offense(params)
-        @offenses << Codegrade::Offense.new(params)
+        @offenses << Codegrade::Offense.new(params.merge(file: 'Commit message'))
       end
 
       def strip(text)

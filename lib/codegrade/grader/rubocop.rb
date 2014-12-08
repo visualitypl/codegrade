@@ -1,8 +1,6 @@
-require 'rubocop'
-
 module Codegrade
-	module Grader
-		class Rubocop
+  module Grader
+    class Rubocop
       attr_reader :config_store, :file
 
       def initialize(file)
